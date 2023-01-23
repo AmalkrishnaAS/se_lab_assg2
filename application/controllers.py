@@ -125,7 +125,7 @@ def cart():
 @app.route('/orders')
 @buyer_login_required
 def orders():
-    return "cart"
+    return "orders"
 
 
 @app.route('/vendor/home')
