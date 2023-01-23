@@ -35,6 +35,7 @@ class Orders(db.Model):
     vendor = db.Column(db.Integer, db.ForeignKey('vendors.id'), nullable=False)
     user = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     product = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
+    date = db.Column(db.String(255), nullable=False)
     qty = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Integer, nullable=False)
     state = db.Column(db.String(255), nullable=False)

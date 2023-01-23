@@ -7,10 +7,20 @@ from flask import current_app as app
 
 from application.models import *
 
-def login_required(f):
+def buyer_login_required(f):
     @wraps(f)
     def wrap(*args, **kwargs):
-        if 'status' in session:
+        if 'type' in session and session['type'] == 'Buyer' and 'status' in session:
+            return f(*args, **kwargs)
+        else:
+            flash('Unauthorized Access','danger')
+            return redirect(url_for('login'))
+    return wrap
+
+def vendor_login_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'type' in session and session['type'] == 'Vendor' and 'status' in session:
             return f(*args, **kwargs)
         else:
             flash('Unauthorized Access','danger')
@@ -42,10 +52,14 @@ def login():
         
         if sha256_crypt.verify(password,user.password):
             session['status'] = True
+            session['type'] = request.form['User']
             session['username'] = user.name
             
             flash('User Logged In','success')
-            return redirect(url_for('home'))
+            if request.form['User'] == 'Vendor':
+                return redirect(url_for('vendor_home'))
+            else:
+                return redirect(url_for('home'))
         else:
             flash('Invalid Password','danger')
             return redirect(url_for('login'))
@@ -86,5 +100,26 @@ def register():
         return render_template('register.html')
     
 @app.route('/home')
+@buyer_login_required
 def home():
-    return "success,success!!"
+    return "buyer,success!!"
+
+@app.route('/vendor/home')
+@vendor_login_required
+def vendor_home():
+    return render_template('vendor_home.html',user = session['username'])
+
+@app.route('/vendor/orders')
+@vendor_login_required
+def vendor_orders():
+    return render_template('vendor_orders.html')
+
+@app.route('/vendor/past_orders')
+@vendor_login_required
+def vendor_past_orders():
+    return render_template('vendor_past_orders.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/')
