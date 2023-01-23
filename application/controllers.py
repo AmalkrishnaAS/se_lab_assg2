@@ -69,6 +69,11 @@ def login():
 @app.route('/register', methods=['GET','POST'])
 def register():
     if request.method == 'POST':
+      if request.form['password']!= request.form['confirm']:
+         flash('passwords not matching','danger')
+         return render_template('register.html')
+      
+      else:
         name = request.form['name']
         email = request.form['email']
         password = sha256_crypt.encrypt(request.form['password'])
@@ -82,7 +87,7 @@ def register():
                 return redirect(url_for('register'))
             if email.split('@')[1] != "nitc.ac.in":
                 flash('Enter a Valid NITC Mail ID','danger')
-                return redirect(url_for('register'))
+                return render_template('register.html')
             user = User(name=name, email=email, password=password, phone=phone)
             db.session.add(user)
             db.session.commit()

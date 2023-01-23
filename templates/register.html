@@ -8,16 +8,19 @@
                 <h2 class="fw-bold mb-4">FreshKartNITC - Register</h2>
                 <form method="POST" action="{{ url_for('register') }}">
                     <div class="form-outline mb-4">
-                        <input type="text" class="form-control form-control-lg" placeholder="Name" name="name" required/>
+                        <input type="text" class="form-control form-control-lg" placeholder="Name" name="name" required value="{{ request.form['name'] }}"/>
                     </div>
                     <div class="form-outline mb-4">
-                        <input type="email" class="form-control form-control-lg" placeholder="Email" name="email" required/>
+                        <input type="email" class="form-control form-control-lg" placeholder="Email" name="email" required value="{{ request.form['email'] }}"/>
                     </div>
                     <div class="form-outline mb-4">
                         <input type="password" class="form-control form-control-lg" placeholder="Password" name="password" required/>
                     </div>
                     <div class="form-outline mb-4">
-                        <input type="text" class="form-control form-control-lg" placeholder="Phone" name="phone" pattern="[0-9]{10}" title="10 Digit format" required/>
+                        <input type="password" class="form-control form-control-lg" placeholder="Confirm password" name="confirm" required/>
+                    </div>
+                    <div class="form-outline mb-4">
+                        <input type="text" class="form-control form-control-lg" placeholder="Phone" name="phone" pattern="[0-9]{10}" title="10 Digit format" required value="{{ request.form['phone'] }}"/>
                     </div>
                     <div class="container mb-4">
                         <div class="d-sm-flex justify-content-center">
