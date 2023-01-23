@@ -76,6 +76,10 @@ def register():
         category = request.form.get('User')
         
         if category == 'Buyer':
+            user = User.query.filter_by(email=email).first()
+            if user is not None:
+                flash('Existing User','danger')
+                return redirect(url_for('register'))
             if email.split('@')[1] != "nitc.ac.in":
                 flash('Enter a Valid NITC Mail ID','danger')
                 return redirect(url_for('register'))
@@ -86,6 +90,10 @@ def register():
             return redirect(url_for('login'))
         
         elif category == 'Vendor':
+            user = Vendors.query.filter_by(email=email).first()
+            if user is not None:
+                flash('Existing User','danger')
+                return redirect(url_for('register'))
             vendor = Vendors(name=name, email=email, password=password, phone=phone)
             db.session.add(vendor)
             db.session.commit()
