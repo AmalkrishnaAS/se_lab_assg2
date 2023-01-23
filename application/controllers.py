@@ -102,7 +102,18 @@ def register():
 @app.route('/home')
 @buyer_login_required
 def home():
-    return "buyer,success!!"
+    return render_template('buyer_home.html',user = session['username'])
+
+@app.route('/cart')
+@buyer_login_required
+def cart():
+    return "cart"
+
+@app.route('/orders')
+@buyer_login_required
+def orders():
+    return "cart"
+
 
 @app.route('/vendor/home')
 @vendor_login_required
