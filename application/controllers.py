@@ -122,7 +122,6 @@ def home():
     for product in products:
         vendor=Vendors.query.with_entities(Vendors.name).filter_by(id=product.vendor).first()
         vendors.append(vendor)
-    print(len(vendors))
     return render_template('buyer_home.html',user = session['username'],products=products, vendors=vendors)
 
 @app.route('/cart')
@@ -152,7 +151,11 @@ def orders():
 @app.route('/vendor/home')
 @vendor_login_required
 def vendor_home():
-    return render_template('vendor_home.html',user = session['username'])
+    products=[]
+    # here we get all the products from vendor with given id
+    id=session['id']
+    products=Products.query.filter_by(vendor=id).all()
+    return render_template('vendor_home.html',user = session['username'], products=products)
 
 @app.route('/vendor/orders')
 @vendor_login_required
