@@ -1,0 +1,32 @@
+{% extends 'base_buyer.html' %}
+
+{% block content %}
+<div class="container py-5 h-100">
+    <div class="card" style="border-radius: 15px;">
+        <div class="card-body p-4">
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th class = "col-1">#</th>
+                    <th class = "col-3">Product</th>
+                    <th class="col-2">Quantity</th>
+                    <th class = "col-3">Vendor</th>
+                    <th class = "col-2">Total Price</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                        <tr>
+                            <th>{{ loop.index }}</th>
+                            <td>{{ products[loop.index0].name }}</td>
+                            <td>{{ order.qty }} Kg</td>
+                            <td>{{ vendors[loop.index0].name }}</td>
+                            <td>₹ {{ order.qty * order.price }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

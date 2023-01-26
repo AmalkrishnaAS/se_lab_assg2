@@ -1,5 +1,6 @@
 import os
-from flask import Flask
+from flask import Flask, session
+from flask_session import Session
 from application import config
 from application.config import DevelopConfig
 from application.database import db
@@ -11,6 +12,7 @@ def create_app():
     app=Flask(__name__,template_folder="templates")
     print("Starting Development")
     app.config.from_object(DevelopConfig)
+    Session(app)
     db.init_app(app)
     app.app_context().push()
     return app,api

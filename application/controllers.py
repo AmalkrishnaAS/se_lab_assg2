@@ -2,6 +2,7 @@ from flask import request, redirect, render_template, url_for, flash, session
 import re
 from passlib.hash import sha256_crypt
 from functools import wraps
+from flask_session import Session
 
 from flask import current_app as app
 
@@ -54,6 +55,7 @@ def login():
             session['status'] = True
             session['type'] = request.form['User']
             session['username'] = user.name
+            session['id']=user.id
             
             flash('User Logged In','success')
             if request.form['User'] == 'Vendor':
@@ -125,7 +127,20 @@ def cart():
 @app.route('/orders')
 @buyer_login_required
 def orders():
-    return "orders"
+    id=session['id']
+    # print(id)
+    # here we get all the orders from user with given id
+    orders=Orders.query.filter_by(user=id).all()
+    # here we are defining 2 lists to store the vendor and product details of the orders
+    vendors=[]
+    products=[]
+    # here we are iterating through the orders and getting the vendor and product details of each order
+    for order in orders:
+        vendor=Vendors.query.filter_by(id=order.vendor).first()
+        vendors.append(vendor)
+        product=Products.query.filter_by(id=order.product).first()
+        products.append(product)
+    return render_template('buyer_orders.html', orders=orders, vendors=vendors, products=products)
 
 
 @app.route('/vendor/home')

@@ -14,3 +14,5 @@ class DevelopConfig(Config):
     SQLALCHEMY_DATABASE_URI="sqlite:///"+os.path.join(SQLITE_DB_DIR,"appdb.sqlite3")
     DEBUG=True
     SECRET_KEY="fgdmgfdgnmddrmdfmngndsm"
+    SESSION_PERMANENT=False
+    SESSION_TYPE="filesystem"
