@@ -117,7 +117,13 @@ def register():
 @app.route('/home')
 @buyer_login_required
 def home():
-    return render_template('buyer_home.html',user = session['username'])
+    products=Products.query.all()
+    vendors=[]
+    for product in products:
+        vendor=Vendors.query.with_entities(Vendors.name).filter_by(id=product.vendor).first()
+        vendors.append(vendor)
+    print(len(vendors))
+    return render_template('buyer_home.html',user = session['username'],products=products, vendors=vendors)
 
 @app.route('/cart')
 @buyer_login_required
