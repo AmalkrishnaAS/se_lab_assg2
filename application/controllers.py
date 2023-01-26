@@ -157,12 +157,39 @@ def vendor_home():
 @app.route('/vendor/orders')
 @vendor_login_required
 def vendor_orders():
-    return render_template('vendor_orders.html')
+    id=session['id']
+    # here we get all the orders from vendor with given id
+    orders=Orders.query.filter_by(vendor=id, state="processing").all()
+    customers=[]
+    products=[]
+    units=[]
+    # here we are iterating through the orders and getting the customer and product details of each order
+    for order in orders:
+        customer=User.query.filter_by(id=order.user).first()
+        customers.append(customer.name)
+        product=Products.query.filter_by(id=order.product).first()
+        products.append(product.name)
+        units.append(product.unit)
+    return render_template('vendor_orders.html', orders=orders, customers=customers, products=products, units=units)
 
 @app.route('/vendor/past_orders')
 @vendor_login_required
 def vendor_past_orders():
-    return render_template('vendor_past_orders.html')
+    id=session['id']
+    # here we get all the orders from vendor with given id and already delivered
+    orders=Orders.query.filter_by(vendor=id, state="delivered").all()
+    customers=[]
+    products=[]
+    units=[]
+
+    # here we are iterating through the orders and getting the customer and product details of each order
+    for order in orders:
+        customer=User.query.filter_by(id=order.user).first()
+        customers.append(customer.name)
+        product=Products.query.filter_by(id=order.product).first()
+        products.append(product.name)
+        units.append(product.unit)
+    return render_template('vendor_past_orders.html', orders=orders, customers=customers, products=products, units=units)
 
 @app.route('/logout')
 def logout():

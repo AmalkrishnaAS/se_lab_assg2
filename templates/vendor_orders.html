@@ -10,18 +10,22 @@
                     <th class = "col-1">#</th>
                     <th class = "col-3">Customer</th>
                     <th class = "col-3">Products</th>
+                    <th class = "col-2">Quantity</th>
                     <th class = "col-2">Total Price</th>
                     <th class = "col-3">Options</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <th>1</th>
-                    <td>Amal Krishna A S</td>
-                    <td>Apple - 1kg</td>
-                    <td> ₹ 10</td>
-                    <td><a class="btn btn-primary ms-auto" href="#">Delivered</a></td>
-                  </tr>
+                  {% for order in orders %}
+                    <tr>
+                      <th>{{ loop.index }}</th>
+                      <td>{{ customers[loop.index0] }}</td>
+                      <td>{{ products[loop.index0] }}</td>
+                      <td>{{order.qty}} {{units[loop.index0]}}</td>
+                      <td> ₹ {{ order.qty * order.price }}</td>
+                      <td><a class="btn btn-primary ms-auto" href="#">Delivered</a></td>
+                    </tr>
+                  {% endfor %}
                 </tbody>
               </table>
         </div>

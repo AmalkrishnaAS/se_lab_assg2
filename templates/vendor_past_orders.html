@@ -10,16 +10,20 @@
                     <th scope="col-1">#</th>
                     <th scope="col-2">Customer</th>
                     <th scope="col-3">Products</th>
-                    <th scope="col-3">Total Price</th>
+                    <th scope="col-2">Quantity</th>
+                    <th scope="col-2">Total Price</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <th>1</th>
-                    <td>Amal Krishna A S</td>
-                    <td>Apple - 1 kg</td>
-                    <td> ₹ 10</td>
-                  </tr>
+                  {% for order in orders %}
+                    <tr>
+                      <th>{{ loop.index }}</th>
+                      <td>{{ customers[loop.index0] }}</td>
+                      <td>{{ products[loop.index0] }}</td>
+                      <td>{{order.qty}} {{units[loop.index0]}}</td>
+                      <td> ₹ {{ order.qty * order.price }}</td>
+                    </tr>
+                  {% endfor %}
                 </tbody>
               </table>
         </div>
