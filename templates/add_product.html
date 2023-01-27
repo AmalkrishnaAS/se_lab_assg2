@@ -1,0 +1,55 @@
+{% extends 'base_vendor.html' %}
+
+{% block content %}
+
+<div class="container py-5">
+    <div class="card">
+        <div class="card-body p-5">
+            <h2 class="fw-bold mb-4">Add Product</h2>
+            <form method='POST' enctype="multipart/form-data">
+                <div class="d-flex flex-row align-items-center flex-wrap">
+                    <div class="col-md-5 mb-3 mx-3">
+                        <label>Product Name</label>
+                        <input type="text" class="form-control" placeholder="Product Name" name="product_name" required>
+                    </div>
+                    <div class="col-md-5 mb-3 mx-3">
+                        <label>Category</label>
+                        <select class="custom-select form-control" name="category" required>
+                            <option value="Other">Other</option>
+                            <option value="Fruits&Vegetables" selected>Fruits&Vegetables</option>
+                            <option value="Diary Items">Diary Items</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex flex-row align-items-center flex-wrap">
+                    <div class="col-md-5 mb-3 mx-3">
+                        <label>Quantity</label>
+                        <input type="number" step=0.01 min=0 class="form-control" placeholder="Quantity" name="qty" required>
+                    </div>
+                    <div class="col-md-5 mb-3 mx-3">
+                        <label>Unit</label>
+                        <select class="custom-select form-control" name="unit" required>
+                            <option value="None" selected>None</option>
+                            <option value="kg">kg</option>
+                            <option value="g">g</option>
+                            <option value="L">L</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex flex-row align-items-center flex-wrap">
+                    <div class="col-md-5 mb-3 mx-3">
+                        <label>Price per Unit</label>
+                        <input type="number" step=0.01 min=0 class="form-control" placeholder="Price" name="price" required>
+                    </div>
+                    <div class="col-md-5 mb-3 mx-3">
+                        <label>Product Image</label>
+                        <input type="file" class="form-control" placeholder="Product Image" name="image" accept="image/*" required>
+                    </div>
+                </div>
+                <input class="btn btn-primary" type="submit"></input>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
