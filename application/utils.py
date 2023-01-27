@@ -25,5 +25,6 @@ def delete_order(product_id):
     orders = Orders.query.filter_by(product = product_id).all()
     for order in orders:
         print(order)
-        db.session.delete(order)
-        db.session.commit()
+        if order.state=='cart':
+            db.session.delete(order)
+            db.session.commit()
