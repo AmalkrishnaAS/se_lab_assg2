@@ -267,7 +267,3 @@ def edit_product(id):
         
     else:
         return render_template('edit_product.html',product=product)
-    
-@app.route('/hello')
-def hello():
-    return str(len(Products.query.filter(Products.image == 'Hello').all()))
