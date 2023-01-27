@@ -2,7 +2,6 @@ from flask import request, redirect, render_template, url_for, flash, session
 import re
 from passlib.hash import sha256_crypt
 from functools import wraps
-from flask_session import Session
 
 from flask import current_app as app
 
