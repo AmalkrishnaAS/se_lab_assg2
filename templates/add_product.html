@@ -1,0 +1,93 @@
+{% extends 'base_vendor.html' %}
+
+{% block content %}
+
+<div class="container bg-light p-3">
+
+    <h1 class="text-center display-5">Add Product</h1>
+
+    <form class=" form-control"
+    action="{{url_for('add_product')}}"
+    method="post"
+    >
+        <div class="mb-3">
+            <label for="product_name" class="form-label">Product Name</label>
+            <input type="text"  value="{{request.form['product_name']}}" class="form-control" id="product_name" aria-describedby="emailHelp"
+            name="product_name"
+            >
+        </div>
+
+        <div class="mb-3">
+            <label for="product_price" class="form-label">Price</label>
+            <input value="{{request.form['product_price']}}" type="number" step="0.1" class="form-control" id="product_name" aria-describedby="emailHelp"
+            name="product_price"
+            >
+        </div>
+
+        <div class="mb-3">
+            <label for="product_quantity" class="form-label">Quantity</label>
+            <input type="number" value="{{request.form['product_quantity']}}"  class="form-control" id="product_name" aria-describedby="emailHelp"
+            name="product_quantity"
+            >
+        </div>
+
+
+        <div class="mb-3">
+            <label for="product_category" class="form-label">Category</label>
+            <select class="form-select" aria-label="Default select example"
+            name="product_category"
+            >
+                <option selected>Category</option>
+                <option value="None">None</option>
+                <option value="Fruits and Veggies">Fruits and Veggies</option>
+                <option value="Diary Porducts">Diary Porducts</option>
+              </select>
+
+        </div>
+
+
+
+
+
+
+
+<div class="mb-3">
+    <label for="product_unit" class="form-label">Unit</label>
+    <select class="form-select" aria-label="Default select example"
+    name="product_unit"
+    >
+        <option selected>Unit</option>
+        <option value="ltrs">ltrs</option>
+        <option value="ml">ml</option>
+        <option value="gms">gms<option>
+        <option value="kg">kg<option>
+        <option value="nos">nos<option>
+      </select>
+</div>
+
+<div class=" mb-3">
+    <label for="product_image" class="form-label">Image Url</label>
+    <input type="text"
+    class=" form-control"
+    name="product_image"
+    >
+
+
+</div>
+<div class="mb-3">
+    <button  class="btn btn-primary"
+    type="submit"
+    >
+        <i class="bi bi-plus-circle"></i>
+        Add Product
+
+    </button>
+</div>
+
+
+    </form>
+
+</div>
+
+
+{% endblock %}

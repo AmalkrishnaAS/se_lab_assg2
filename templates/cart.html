@@ -1,0 +1,77 @@
+{% extends 'base_buyer.html' %}
+{% block content %}
+
+<div class=" container bg-light">
+
+   
+   
+    <div class="row">
+        <div class="">
+            <h1 class="text-center display-3">
+                <i class="bi bi-cart-fill"></i>
+
+                Cart</h1>
+                <hr>
+        </div>
+        {% if orders|length == 0 %}
+        <h1 class="text-center display-6 text-black-50">No items in cart
+            
+    
+        </h1>
+        {% endif %}
+
+    <ul class=" list-group p-3">
+
+        {% for order in orders %}
+
+        <li class=" list-group-item">
+           <div class="p-2 d-flex flex-wrap justify-content-between  ">
+            <div class="img" style="width: 100px;">
+                <img src="{{
+                    products[loop.index0].image
+                
+                }}"  alt="" class="img-fluid">
+            </div>
+
+            <div class="d-flex-col gap-2 align-items-center ">
+                <h3 class="fs-5">
+                    {{products[loop.index0].name}}
+
+                </h3>
+                <span class="text-muted">
+                 {{vendors[loop.index0].name}}
+                </span>
+               <div>
+                     <span class="badge bg-primary">
+                            {{order.qty}} {{products[loop.index0].unit}}
+                     </span>
+                     <span class="badge bg-primary">
+                        ₹ {{order.price}}
+                     </span>
+               </div>
+
+
+            </div>
+
+            <div class="btn-group align-items-center ">
+                <form action="/order" method="POST">
+                    <input type="hidden" name="order_id" value="{{order.id}}">
+                    
+                    <button class="btn btn-primary" type="submit">Order </button>
+                </form>
+                
+                <button class="btn btn-danger">Remove</button>
+               
+            </div>
+
+           </div>
+
+        </li>
+           
+            {% endfor %}
+    </ul>
+
+</div>
+
+
+{% endblock %}

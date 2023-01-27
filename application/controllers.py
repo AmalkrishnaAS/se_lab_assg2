@@ -3,8 +3,10 @@ import re
 from passlib.hash import sha256_crypt
 from functools import wraps
 from flask_session import Session
+import os
 
 from flask import current_app as app
+from datetime import datetime
 
 from application.models import *
 
@@ -127,7 +129,19 @@ def home():
 @app.route('/cart')
 @buyer_login_required
 def cart():
-    return "cart"
+    id=session['id']
+    # here we get all the orders from user with given id
+    orders=Orders.query.filter_by(user=id, state='cart').all()
+    # here we are defining 2 lists to store the vendor and product details of the orders
+    vendors=[]
+    products=[]
+    # here we are iterating through the orders and getting the vendor and product details of each order
+    for order in orders:
+        vendor=Vendors.query.filter_by(id=order.vendor).first()
+        vendors.append(vendor)
+        product=Products.query.filter_by(id=order.product).first()
+        products.append(product)
+    return render_template('cart.html', orders=orders, vendors=vendors, products=products)
 
 @app.route('/orders')
 @buyer_login_required
@@ -135,7 +149,7 @@ def orders():
     id=session['id']
     # print(id)
     # here we get all the orders from user with given id
-    orders=Orders.query.filter_by(user=id).all()
+    orders=Orders.query.filter_by(user=id, state='processing').all()
     # here we are defining 2 lists to store the vendor and product details of the orders
     vendors=[]
     products=[]
@@ -198,3 +212,93 @@ def vendor_past_orders():
 def logout():
     session.clear()
     return redirect('/')
+
+@app.route('/buyer/add_to_cart/<int:id>',methods=['GET','POST'])
+
+def add_to_cart(id):
+    user=session['id']
+    if float(request.form['quantity']) > Products.query.filter_by(id=id).first().qty or float(request.form['quantity']) <= 0:
+        flash('Enter valid quantity','danger')
+        return redirect(url_for('home'))
+    order=Orders(user=user,product=id,vendor=Products.query.filter_by(id=id).first().vendor,state="cart",date=datetime.now(),qty=request.form['quantity'],price=Products.query.filter_by(id=id).first().price)
+    db.session.add(order)
+    db.session.commit()
+    flash('Added to cart','success')
+    return redirect(url_for('home'))
+
+
+#order 
+@app.route('/order/',methods=['POST'])
+
+def order():
+    
+    if request.method == 'POST':
+        id=request.form['order_id']
+        order=Orders.query.filter_by(id=id).first()
+        order.state='processing'
+        
+        #reduce the quantity of the product
+        
+        product=Products.query.filter_by(id=order.product).first()
+        
+        if product.qty < order.qty:
+            flash('Not enough quantity','danger')
+            return redirect(url_for('cart'))
+        #update the quantity in the database
+        product.qty=product.qty-order.qty
+        
+        
+        db.session.commit()
+        flash('Order Placed','success')
+        return redirect(url_for('home'))
+    
+    
+@app.route('/vendor/add-product',methods=['GET','POST'])
+    
+def add_product():
+    if request.method=='POST':
+        name=request.form['product_name']
+        price=request.form['product_price']
+        quantity=request.form['product_quantity']
+        unit=request.form['product_unit']
+        vendor=session['id']
+        category=request.form['product_category']
+        image=request.form['product_image']
+        if name=="" or price=="" or quantity=="" or unit=="":
+            flash('Please fill all the fields','danger')
+            return redirect(url_for('add_product'))
+        
+        
+        
+        #check if the quantity is a number
+        isInt=quantity.isdigit()
+        
+        if category=="None" and (  isInt):
+            flash('Please enter a valid quantity','danger')
+            return redirect(url_for('add_product'))
+        
+        
+        
+        product=Products(name=name,price=price,qty=quantity,unit=unit,vendor=vendor,category=category,image=image)
+        db.session.add(product)
+        db.session.commit()
+        flash('Product added','success')
+        return redirect(url_for('vendor_home'))
+    else:
+        return render_template('add_product.html')
+    
+    
+    
+    
+@app.route('/delete' ,methods=['POST'])
+
+def delete():
+    id=request.form['product_id']
+    product=Products.query.filter_by(id=id).first()
+    db.session.delete(product)
+    db.session.commit()
+    flash('Product deleted','success')
+    return redirect(url_for('vendor_home'))
+    
+    
+

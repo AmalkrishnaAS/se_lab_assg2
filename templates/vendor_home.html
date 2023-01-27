@@ -1,52 +1,64 @@
 {% extends 'base_vendor.html' %}
 
 {% block content %}
-<div class="container py-5 h-100">
+<div class="container py-5 h-100 ">
     <div class="card" style="border-radius: 15px;">
-        <div class="card-body p-4">
+        <div class="card-body p-4 bg-light">
             <div class="d-sm-flex">
                 <h4>Welcome {{user}}</h4>
-                <a class="btn btn-primary ms-auto" href="#">Add New Product</a>
+                <a class="btn btn-primary ms-auto" href="{{ url_for('add_product') }}">
+                Add New Product</a>
+                
             </div>
         </div>
     </div>
 </div>
 
 <div class="container py-5 h-100">
-    <div class="card" style="border-radius: 15px;">
-        <div class="card-body p-4">
-            <table class="table">
-                <thead>
-                  <tr>
-                    <th class="col-1">#</th>
-                    <th class="col-4"></th>
-                    <th class="col-3">Details</th>
-                    <th class="col-4">Options</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for  product in products %}
-                    <tr>
-                      <th>{{loop.index}}</th>
-                      <td><img class="img-fluid" src={{products[loop.index0].image}} height=60 width=180/></td>
-                      <td>
-                        <div class="d-flex flex-column">
-                          <strong class="32">{{ products[loop.index0].name }}</strong>
-                          <span class="text-muted">Rs {{ products[loop.index0].price }}</span>
-                          {% if product.qty>0 %}
-                            <span class="text-success text-capitalize">Quantity : {{product.qty}}{{product.unit}}</span>
-                          {% else %}
-                            <span class="text-danger text-capitalize">out of stock</span>
-                          {% endif %}
-                      </div>
-                      </td>
-                      <td><a href="#" class="btn btn-primary">Edit</a></td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
+  <ul class=" list-group">
+    {% for product in products %} 
+    <li class=" list-group-item p-3 ">
+      <div class=" d-flex justify-content-between align-items-center ">
+        <div class="image" style="width: 100px;">
+          <img src="{{product.image}}" alt="" class="img-fluid" >
         </div>
-    </div>
+        <div class="details">
+          <p class="fw-bold text-capitalize">{{product.name}}</p>
+          <p class="text-danger ">
+            ₹ {{product['price']}} per {{product['unit']}}
+
+          </p>
+          <p class=" text-muted">
+            {{product['qty']}} {{product['unit']}} available
+
+          </p>
+
+
+        </div>
+
+        <div class="btn-group">
+          <a class=" btn btn-primary">
+            Edit
+          </a>
+        <form action="/delete" method="POST">
+          <input type="hidden" name="product_id" value="{{product['id']}}">
+          <button class=" btn btn-danger " type="submit"
+          >
+            Delete
+          </button>
+        </form>
+        </div>
+      
+
+      </div>
+    </li> 
+
+
+    {%endfor%}
+
+
+  </ul>
+   
 </div>
 
 
