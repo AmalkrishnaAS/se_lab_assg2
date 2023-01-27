@@ -3,6 +3,7 @@ from flask import request, redirect, render_template, url_for, flash, session
 from passlib.hash import sha256_crypt
 from functools import wraps
 from werkzeug.utils import secure_filename
+from datetime import datetime
 
 from flask import current_app as app
 
@@ -126,35 +127,70 @@ def logout():
 @app.route('/home')
 @buyer_login_required
 def home():
-    products=Products.query.all()
-    vendors=[]
-    for product in products:
-        vendor=Vendors.query.with_entities(Vendors.name).filter_by(id=product.vendor).first()
-        vendors.append(vendor)
-    return render_template('buyer_home.html',user = session['username'],products=products, vendors=vendors)
+    products = Products.query.all()
+    product_list = utils.get_product_list(products)
+    return render_template('buyer_home.html',user = session['username'],products=product_list)
+
+@app.route('/add/<int:id>/cart',methods=["POST"])
+@buyer_login_required
+def add_to_cart(id):
+    qty = request.form['quantity']
+    product = Products.query.filter_by(id=id).first()
+    if product.qty < float(qty):
+        flash("Requested Quantity Not Available",'danger')
+        return redirect(url_for('home'))
+    
+    order = Orders(vendor = product.vendor,
+                   user = session['id'],
+                   product = product.id,
+                   date = datetime.now().strftime("%Y/%m/%d, %H:%M:%S"),
+                   qty = qty,
+                   price = product.price,
+                   state = "In Cart"
+                   )
+    db.session.add(order)
+    db.session.commit()
+    flash("Added to Cart",'success')
+    return redirect(url_for('home'))
 
 @app.route('/cart')
 @buyer_login_required
 def cart():
-    return "cart"
+    items = utils.get_cart_data(session['id'])
+    return render_template("cart.html",orders=items)
+
+@app.route('/order/<int:id>/delete')
+@buyer_login_required
+def delete_from_kart(id):
+    order = Orders.query.filter_by(id=id).first()
+    db.session.delete(order)
+    db.session.commit()
+    flash('Item Removed from Cart','success')
+    return redirect(url_for('cart'))
+
+@app.route('/add/<int:id>/order')
+@buyer_login_required
+def item_order(id):
+    order = Orders.query.filter_by(id=id).first()
+    product = Products.query.filter_by(id=order.product).first()
+    if order.qty > product.qty:
+        flash("Requested Quantity Not Available",'danger')
+        return redirect(url_for('cart'))
+    else:
+        order.state = "Ordered"
+        order.price = product.price
+        order.date = datetime.now().strftime("%Y/%m/%d, %H:%M:%S")
+        product.qty = product.qty - order.qty
+        db.session.commit()
+        flash("Order Placed",'success')
+        return redirect(url_for('cart'))
+        
 
 @app.route('/orders')
 @buyer_login_required
 def orders():
-    id=session['id']
-    # print(id)
-    # here we get all the orders from user with given id
-    orders=Orders.query.filter_by(user=id).all()
-    # here we are defining 2 lists to store the vendor and product details of the orders
-    vendors=[]
-    products=[]
-    # here we are iterating through the orders and getting the vendor and product details of each order
-    for order in orders:
-        vendor=Vendors.query.filter_by(id=order.vendor).first()
-        vendors.append(vendor)
-        product=Products.query.filter_by(id=order.product).first()
-        products.append(product)
-    return render_template('buyer_orders.html', orders=orders, vendors=vendors, products=products)
+    orders, prev_orders = utils.get_orders(session['id'])
+    return render_template('orders.html', orders=orders, prev_orders = prev_orders )
 
 
 @app.route('/vendor/home')
@@ -166,39 +202,22 @@ def vendor_home():
 @app.route('/vendor/orders')
 @vendor_login_required
 def vendor_orders():
-    id=session['id']
-    # here we get all the orders from vendor with given id
-    orders=Orders.query.filter_by(vendor=id, state="processing").all()
-    customers=[]
-    products=[]
-    units=[]
-    # here we are iterating through the orders and getting the customer and product details of each order
-    for order in orders:
-        customer=User.query.filter_by(id=order.user).first()
-        customers.append(customer.name)
-        product=Products.query.filter_by(id=order.product).first()
-        products.append(product.name)
-        units.append(product.unit)
-    return render_template('vendor_orders.html', orders=orders, customers=customers, products=products, units=units)
+    orders=Orders.query.filter_by(vendor=session['id'], state="Ordered").all()
+    return render_template('vendor_orders.html', orders = utils.get_vendor_orders(orders))
+
+@app.route('/order/<int:id>/delivery')
+@vendor_login_required
+def delivered(id):
+    order=Orders.query.filter_by(id=id).first()
+    order.state = "Delivered"
+    db.session.commit()
+    return redirect(url_for('vendor_orders'))
 
 @app.route('/vendor/past_orders')
 @vendor_login_required
 def vendor_past_orders():
-    id=session['id']
-    # here we get all the orders from vendor with given id and already delivered
-    orders=Orders.query.filter_by(vendor=id, state="delivered").all()
-    customers=[]
-    products=[]
-    units=[]
-
-    # here we are iterating through the orders and getting the customer and product details of each order
-    for order in orders:
-        customer=User.query.filter_by(id=order.user).first()
-        customers.append(customer.name)
-        product=Products.query.filter_by(id=order.product).first()
-        products.append(product.name)
-        units.append(product.unit)
-    return render_template('vendor_past_orders.html', orders=orders, customers=customers, products=products, units=units)
+    orders=Orders.query.filter_by(vendor=session['id'], state="Delivered").all()
+    return render_template('vendor_past_orders.html', orders = utils.get_vendor_orders(orders))
 
 @app.route('/product/add',methods=['GET','POST'])
 @vendor_login_required
@@ -226,7 +245,7 @@ def add_product():
         db.session.add(product)
         db.session.commit()
         
-        product_new = Products.query.filter_by(image='Hello').first()
+        product_new = Products.query.filter_by(image='Hello',vendor=vendor).first()
         filename = secure_filename(utils.format_filename(product_new.id,image.filename))
         image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         

@@ -1,0 +1,53 @@
+{% extends 'base_buyer.html' %}
+
+{% block content %}
+<div class="container py-5 h-100">
+    <h3>Your Cart</h3>
+    <div class="card" style="border-radius: 15px;">
+        <div class="card-body p-4" style="overflow-x:auto;">
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th class = "col-1">#</th>
+                    <th class = "col-2"></th>
+                    <th class = "col-3">Product</th>
+                    <th class = "col-2">Quantity</th>
+                    <th class = "col-2">Total Price</th>
+                    <th class = "col-2">Options</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                        <tr>
+                            <th>{{ loop.index }}</th>
+                            <td><img src="/static/images/{{order['image']}}" height=100 width=180/></td>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <h6>{{ order['name'] }}</h6>
+                                    <span class="text-primary">{{ order['vendor'] }}</span>
+                                    <h5>₹ {{ order['price'] }}</h5>
+                                    {% if order['available'] > 0 %}
+                                    <span class="text-success text-capitalize">In Stock</span>
+                                    <span>Quantity Available: {{order['available']}}{{order['unit']}}</span>
+                                    {% else %}
+                                    <span class="text-danger text-capitalize">Out Of Stock</span>
+                                    {% endif %}
+                                  </div>
+                            </td>
+                            <td>{{ order['qty'] }}{{order['unit']}}</td>
+                            <td>₹ {{ order['total']}}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="#" class="btn btn-primary">Edit</a>
+                                    <a href="{{url_for('delete_from_kart',id=order['id'])}}" class="btn btn-danger">Delete</a>
+                                    <a href="{{url_for('item_order',id=order['id'])}}" class="btn btn-success">Order</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+              </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -2,33 +2,38 @@
 
 {% block content %}
 <div class="container py-5 h-100">
-    <div class="card" style="border-radius: 15px;">
-        <div class="card-body p-4">
-            <table class="table">
-                <thead>
-                  <tr>
-                    <th scope="col-1">#</th>
-                    <th scope="col-2">Customer</th>
-                    <th scope="col-3">Products</th>
-                    <th scope="col-2">Quantity</th>
-                    <th scope="col-2">Total Price</th>
-                  </tr>
-                </thead>
-                <tbody>
+  <div class="card" style="border-radius: 15px;">
+      <div class="card-body p-4">
+          <h3>Current Orders</h3>
+          <table class="table">
+              <thead>
+                <tr>
+                  <th class = "col-1">#</th>
+                  <th class = "col-3">Customer</th>
+                  <th class="col-3">Details</th>
+                  <th class="col-3">Date</th>
+                  <th class = "col-2">Total Price</th>
+                </tr>
+              </thead>
+              <tbody>
                   {% for order in orders %}
-                    <tr>
-                      <th>{{ loop.index }}</th>
-                      <td>{{ customers[loop.index0] }}</td>
-                      <td>{{ products[loop.index0] }}</td>
-                      <td>{{order.qty}} {{units[loop.index0]}}</td>
-                      <td> ₹ {{ order.qty * order.price }}</td>
-                    </tr>
+                      <tr>
+                          <th>{{ loop.index }}</th>
+                          <td>
+                              <div>
+                                  <span>{{order['buyer_name']}}
+                                  <br>
+                                  Phone: {{order['buyer_phone']}}</span>
+                              </div>
+                          </td>
+                          <td>{{ order['product_name'] }} x {{ order['qty'] }}</td>
+                          <td>{{ order['date'] }}</td>
+                          <td>₹ {{ order['price'] }}</td>
+                      </tr>
                   {% endfor %}
-                </tbody>
-              </table>
-        </div>
-    </div>
+              </tbody>
+            </table>
+      </div>
+  </div>
 </div>
-
-
 {% endblock %}
