@@ -16,3 +16,6 @@ class DevelopConfig(Config):
     SECRET_KEY="fgdmgfdgnmddrmdfmngndsm"
     SESSION_PERMANENT=False
     SESSION_TYPE="filesystem"
+    UPLOAD_FOLDER=os.path.join(basedir,"../static/uploads/")
+    ALLOWED_EXTENSIONS=set(["png","jpg","jpeg","gif"])
+    STATIC_FOLDER=os.path.join(basedir,"../static/")

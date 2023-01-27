@@ -4,11 +4,25 @@ from passlib.hash import sha256_crypt
 from functools import wraps
 from flask_session import Session
 import os
+from werkzeug.utils import secure_filename
+import uuid
 
 from flask import current_app as app
 from datetime import datetime
 
 from application.models import *
+
+def upload_file(file):
+    
+    
+    #save the file to the upload folder
+    filename = secure_filename(uuid.uuid4().hex + file.filename)
+    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    return filename
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+    
 
 def buyer_login_required(f):
     @wraps(f)
@@ -263,7 +277,16 @@ def add_product():
         unit=request.form['product_unit']
         vendor=session['id']
         category=request.form['product_category']
-        image=request.form['product_image']
+        image=request.files['product_image']
+        
+        if image.filename=="":
+            flash('Please select an image','danger')
+            return redirect(url_for('add_product'))
+        
+        if not image or not allowed_file(image.filename):
+            flash('Please select a valid image','danger')
+            return redirect(url_for('add_product'))
+        
         if name=="" or price=="" or quantity=="" or unit=="":
             flash('Please fill all the fields','danger')
             return redirect(url_for('add_product'))
@@ -277,9 +300,11 @@ def add_product():
             flash('Please enter a valid quantity','danger')
             return redirect(url_for('add_product'))
         
+        img_path=upload_file(image)
         
         
-        product=Products(name=name,price=price,qty=quantity,unit=unit,vendor=vendor,category=category,image=image)
+        
+        product=Products(name=name,price=price,qty=quantity,unit=unit,vendor=vendor,category=category,image=img_path)
         db.session.add(product)
         db.session.commit()
         flash('Product added','success')
@@ -295,10 +320,74 @@ def add_product():
 def delete():
     id=request.form['product_id']
     product=Products.query.filter_by(id=id).first()
-    db.session.delete(product)
-    db.session.commit()
-    flash('Product deleted','success')
-    return redirect(url_for('vendor_home'))
+    #delete the product image from the folder
+    
+    
+    #delete file from static folder'
+    #CHECK IF THE FILE EXISTS IN STATIC FOLDER
+    if os.path.exists(os.path.join(app.config['STATIC_FOLDER'],product.image)):
+
+        os.remove(os.path.join(app.config['STATIC_FOLDER'],product.image))
+
+        db.session.delete(product)
+        db.session.commit()
+    
+    
+        flash('Product deleted','success')
+        return redirect(url_for('vendor_home'))
+    
+    else:
+        db.session.delete(product)
+        db.session.commit()
+    
+    
+        flash('Product deleted','success')
+        return redirect(url_for('vendor_home'))
+    
+    
+    
+@app.route('/vendor/edit-product/<int:id>',methods=['GET','POST'])
+
+def edit_product(id):
+    
+    if request.method=='POST':
+        product=Products.query.filter_by(id=id).first()
+        
+        name=request.form['product_name']
+        price=request.form['product_price']
+        quantity=request.form['product_quantity']
+        unit=request.form['product_unit']
+        vendor=session['id']
+        category=request.form['product_category']
+        image=request.files['product_image']
+        
+        if image.filename!="":
+            if allowed_file(image.filename):
+                #delete the old image
+                os.remove(os.path.join(app.config['UPLOAD_FOLDER'],product.image))
+                img_path=upload_file(image)
+            
+        else:
+            img_path=product.image
+            
+        product.name=name
+        product.price=price
+        product.qty=quantity
+        product.unit=unit
+        product.category=category
+        product.image=img_path
+        
+        db.session.commit()
+        
+        flash('Product updated','success')
+        
+        return redirect(url_for('vendor_home'))
+    
+    return render_template('edit_product.html',product=Products.query.filter_by(id=id).first())
+        
+        
+        
+    
     
     
 

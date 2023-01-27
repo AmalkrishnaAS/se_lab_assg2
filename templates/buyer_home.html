@@ -26,7 +26,7 @@
                     {% for product in products %}
                     <tr>
                       <th>{{ loop.index }}</th>
-                      <td><img class="img-fluid" src= {{products[loop.index0].image}} height=60 width=180/></td>
+                      <td><img class="img-fluid" src= ../static/uploads/{{products[loop.index0].image}} height=60 width=180/></td>
                       <td>
                           <div class="d-flex flex-column">
                             <strong class="32">{{ products[loop.index0].name }}</strong>
@@ -35,7 +35,9 @@
                             {% if products[loop.index0].qty>0 %}
                               <span class="text-success text-capitalize">in stock</span>
                             {% else %}
-                              <span class="text-danger text-capitalize">out of stock</span>
+                              <span class="text-danger text-capitalize">
+                                
+                              </span>
                             {% endif %}
                         </div>
                       </td>
