@@ -6,7 +6,7 @@
         <div class="card-body p-4">
             <div class="d-sm-flex">
                 <h4>Welcome {{user}}</h4>
-                <a class="btn btn-primary ms-auto" href="#">Add New Product</a>
+                <a class="btn btn-primary ms-auto" href="{{ url_for('add_product')}}">Add New Product</a>
             </div>
         </div>
     </div>
@@ -14,7 +14,7 @@
 
 <div class="container py-5 h-100">
     <div class="card" style="border-radius: 15px;">
-        <div class="card-body p-4">
+        <div class="card-body p-4" style="overflow-x:auto;">
             <table class="table">
                 <thead>
                   <tr>
@@ -27,20 +27,20 @@
                 <tbody>
                   {% for  product in products %}
                     <tr>
-                      <th>{{loop.index}}</th>
-                      <td><img class="img-fluid" src={{products[loop.index0].image}} height=60 width=180/></td>
+                      <th>{{ loop.index }}</th>
+                      <td><img src="/static/images/{{ product.image }}" height=100 width=180/></td>
                       <td>
                         <div class="d-flex flex-column">
-                          <strong class="32">{{ products[loop.index0].name }}</strong>
-                          <span class="text-muted">Rs {{ products[loop.index0].price }}</span>
-                          {% if product.qty>0 %}
-                            <span class="text-success text-capitalize">Quantity : {{product.qty}}{{product.unit}}</span>
+                          <strong class="32">{{ product.name }}</strong>
+                          <span class="text-muted">₹ {{ product.price }}</span>
+                          {% if product.qty > 0 %}
+                            <span class="text-success text-capitalize">Quantity : {{ product.qty }}{{ product.unit }}</span>
                           {% else %}
-                            <span class="text-danger text-capitalize">out of stock</span>
+                            <span class="text-danger text-capitalize">Out of stock</span>
                           {% endif %}
                       </div>
                       </td>
-                      <td><a href="#" class="btn btn-primary">Edit</a></td>
+                      <td><a href="/product/{{product.id}}/edit" class="btn btn-primary">Edit</a></td>
                     </tr>
                   {% endfor %}
                 </tbody>

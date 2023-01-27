@@ -1,11 +1,13 @@
+import os
 from flask import request, redirect, render_template, url_for, flash, session
-import re
 from passlib.hash import sha256_crypt
 from functools import wraps
+from werkzeug.utils import secure_filename
 
 from flask import current_app as app
 
 from application.models import *
+from application import utils
 
 def buyer_login_required(f):
     @wraps(f)
@@ -38,7 +40,7 @@ def login():
         email = request.form['email']
         password = request.form['password']
         
-        
+        #check if existing user
         if request.form.get('User') == 'Buyer':
             user = User.query.filter_by(email=email).first()
         elif request.form.get('User') == 'Vendor':
@@ -50,6 +52,7 @@ def login():
             flash('Non Existent User','danger')
             return redirect(url_for('login'))
         
+        #verify Password
         if sha256_crypt.verify(password,user.password):
             session['status'] = True
             session['type'] = request.form['User']
@@ -70,9 +73,10 @@ def login():
 @app.route('/register', methods=['GET','POST'])
 def register():
     if request.method == 'POST':
+        #check confirm password
       if request.form['password']!= request.form['confirm']:
-         flash('passwords not matching','danger')
-         return render_template('register.html')
+        flash('passwords not matching','danger')
+        return render_template('register.html')
       
       else:
         name = request.form['name']
@@ -113,6 +117,12 @@ def register():
     else:
         return render_template('register.html')
     
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/')
+    
 @app.route('/home')
 @buyer_login_required
 def home():
@@ -150,10 +160,7 @@ def orders():
 @app.route('/vendor/home')
 @vendor_login_required
 def vendor_home():
-    products=[]
-    # here we get all the products from vendor with given id
-    id=session['id']
-    products=Products.query.filter_by(vendor=id).all()
+    products=Products.query.filter_by(vendor=session['id']).all()
     return render_template('vendor_home.html',user = session['username'], products=products)
 
 @app.route('/vendor/orders')
@@ -193,7 +200,70 @@ def vendor_past_orders():
         units.append(product.unit)
     return render_template('vendor_past_orders.html', orders=orders, customers=customers, products=products, units=units)
 
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect('/')
+@app.route('/product/add',methods=['GET','POST'])
+@vendor_login_required
+def add_product():
+    if request.method=='POST':
+        name = request.form['product_name']
+        category = request.form['category']
+        qty = request.form['qty']
+        unit = request.form['unit']
+        if unit == "None":
+            unit = ' '
+        price = request.form['price']
+        vendor = session['id'] 
+        image = request.files['image']
+            
+        
+        product = Products(name = name,
+                           vendor = vendor,
+                           category = category,
+                           price = price,
+                           qty = qty,
+                           unit = unit,
+                           image = 'Hello')
+        
+        db.session.add(product)
+        db.session.commit()
+        
+        product_new = Products.query.filter_by(image='Hello').first()
+        filename = secure_filename(utils.format_filename(product_new.id,image.filename))
+        image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        
+        product_new.image = filename
+        db.session.commit()
+        
+        flash('New Product Added','success')
+        return redirect(url_for('vendor_home'))      
+        
+    return render_template('add_product.html')
+
+@app.route('/product/<int:id>/edit',methods=['GET','POST'])
+@vendor_login_required
+def edit_product(id):
+    product = Products.query.filter_by(id=id).first()
+    if request.method == 'POST':
+        product.name = request.form['product_name']
+        product.category = request.form['category']
+        product.qty = request.form['qty']
+        unit = request.form['unit']
+        if unit == "None":
+            product.unit = ' '
+        else:
+            product.unit = unit
+        product.price = request.form['price']
+        product.vendor = session['id']
+        image = request.files.get('image')
+
+        if image.filename:
+            path = os.path.join(app.config['UPLOAD_FOLDER'], product.image)
+            os.remove(path)
+            image.save(path)
+            
+        db.session.commit()
+        
+        flash('Product Edited','success')
+        return redirect(url_for('vendor_home')) 
+        
+    else:
+        return render_template('edit_product.html',product=product)
