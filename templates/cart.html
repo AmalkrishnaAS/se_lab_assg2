@@ -22,28 +22,34 @@
 
     <ul class=" list-group p-3">
 
+
+
         {% for order in orders %}
+
+        {% if order!=None %}
+
+
 
         <li class=" list-group-item">
            <div class="p-2 d-flex flex-wrap justify-content-between  ">
             <div class="img" style="width: 100px;">
                 <img src="../static/uploads/{{
-                    products[loop.index0].image
+                    order.product.image
                 
                 }}"  alt="" class="img-fluid">
             </div>
 
             <div class="d-flex-col gap-2 align-items-center ">
                 <h3 class="fs-5">
-                    {{products[loop.index0].name}}
+                    {{order.product.name}}
 
                 </h3>
                 <span class="text-muted">
-                 {{vendors[loop.index0].name}}
+                 {{order.vendor.name}}
                 </span>
                <div>
                      <span class="badge bg-primary">
-                            {{order.qty}} {{products[loop.index0].unit}}
+                            {{order.qty}} {{order.product.unit}}
                      </span>
                      <span class="badge bg-primary">
                         ₹ {{order.price}}
@@ -67,6 +73,7 @@
            </div>
 
         </li>
+        {%endif%}
            
             {% endfor %}
     </ul>

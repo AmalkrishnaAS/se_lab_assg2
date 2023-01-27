@@ -9,19 +9,14 @@ import uuid
 
 from flask import current_app as app
 from datetime import datetime
-
+from application.utils import *
 from application.models import *
 
-def upload_file(file):
-    
-    
-    #save the file to the upload folder
-    filename = secure_filename(uuid.uuid4().hex + file.filename)
-    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-    return filename
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+
+
+
+
     
 
 def buyer_login_required(f):
@@ -147,15 +142,11 @@ def cart():
     # here we get all the orders from user with given id
     orders=Orders.query.filter_by(user=id, state='cart').all()
     # here we are defining 2 lists to store the vendor and product details of the orders
-    vendors=[]
-    products=[]
-    # here we are iterating through the orders and getting the vendor and product details of each order
     for order in orders:
-        vendor=Vendors.query.filter_by(id=order.vendor).first()
-        vendors.append(vendor)
-        product=Products.query.filter_by(id=order.product).first()
-        products.append(product)
-    return render_template('cart.html', orders=orders, vendors=vendors, products=products)
+        order.price=order.qty*order.price
+        order.vendor_name=Vendors.query.filter_by(id=order.vendor).first()
+        order.product=Products.query.filter_by(id=order.product).first()
+    return render_template('cart.html', orders=orders)
 
 @app.route('/orders')
 @buyer_login_required
@@ -232,7 +223,7 @@ def logout():
 def add_to_cart(id):
     user=session['id']
     if float(request.form['quantity']) > Products.query.filter_by(id=id).first().qty or float(request.form['quantity']) <= 0:
-        flash('Enter valid quantity','danger')
+        flash('insufficient quantity','danger')
         return redirect(url_for('home'))
     order=Orders(user=user,product=id,vendor=Products.query.filter_by(id=id).first().vendor,state="cart",date=datetime.now(),qty=request.form['quantity'],price=Products.query.filter_by(id=id).first().price)
     db.session.add(order)
@@ -330,6 +321,7 @@ def delete():
         os.remove(os.path.join(app.config['STATIC_FOLDER'],product.image))
 
         db.session.delete(product)
+        delete_order(id)
         db.session.commit()
     
     
@@ -338,6 +330,7 @@ def delete():
     
     else:
         db.session.delete(product)
+        delete_order(id)
         db.session.commit()
     
     
@@ -383,7 +376,18 @@ def edit_product(id):
         
         return redirect(url_for('vendor_home'))
     
-    return render_template('edit_product.html',product=Products.query.filter_by(id=id).first())
+    return render_template('edit_product.html',produceft=Products.query.filter_by(id=id).first())
+
+
+@app.route('/deliver',methods=['POST'])
+
+def deliver():
+    id=request.form['order_id']
+    order=Orders.query.filter_by(id=id).first()
+    order.state='delivered'
+    db.session.commit()
+    flash('Order delivered','success')
+    return redirect(url_for('vendor_home'))
         
         
         

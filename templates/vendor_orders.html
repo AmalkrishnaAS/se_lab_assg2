@@ -23,7 +23,18 @@
                       <td>{{ products[loop.index0] }}</td>
                       <td>{{order.qty}} {{units[loop.index0]}}</td>
                       <td> ₹ {{ order.qty * order.price }}</td>
-                      <td><a class="btn btn-primary ms-auto" href="#">Delivered</a></td>
+
+                      <td>
+                        <form action="/deliver"method='POST'>
+
+                          <input type="hidden" name="order_id" value="{{order.id}}">
+
+                          <button type="submit" class="btn btn-primary ms-auto" >Delivered</button>
+
+
+                        </form>
+                      </td>
+                    
                     </tr>
                   {% endfor %}
                 </tbody>
