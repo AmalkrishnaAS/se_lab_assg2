@@ -124,12 +124,21 @@ def logout():
     session.clear()
     return redirect('/')
     
-@app.route('/home')
+@app.route('/home',methods=["GET",'POST'])
 @buyer_login_required
 def home():
     products = Products.query.all()
+    if request.method == "POST":
+        print(request.form['vendor'],request.form['category'])
+        if request.form['vendor'] != "Select Vendor" and request.form['category'] != "Select Category":
+            products = Products.query.filter_by(vendor=request.form['vendor'],category=request.form['category']).all()
+        elif request.form['vendor'] != "Select Vendor":
+            products = Products.query.filter_by(vendor=request.form['vendor']).all()
+        elif request.form['category'] != "Select Category":
+            products = Products.query.filter_by(category=request.form['category']).all()
     product_list = utils.get_product_list(products)
-    return render_template('buyer_home.html',user = session['username'],products=product_list)
+    vendors = Vendors.query.all()
+    return render_template('buyer_home.html',user = session['username'],products = product_list,vendors = vendors)
 
 @app.route('/add/<int:id>/cart',methods=["POST"])
 @buyer_login_required
@@ -163,6 +172,9 @@ def cart():
 @buyer_login_required
 def delete_from_kart(id):
     order = Orders.query.filter_by(id=id).first()
+    if order.user!= session['id']:
+        flash('Unauthorized Access','danger')
+        return redirect(url_for('login'))
     db.session.delete(order)
     db.session.commit()
     flash('Item Removed from Cart','success')
@@ -172,6 +184,9 @@ def delete_from_kart(id):
 @buyer_login_required
 def edit_kart(id):
     order = Orders.query.filter_by(id=id).first()
+    if order.user!= session['id']:
+        flash('Unauthorized Access','danger')
+        return redirect(url_for('login'))
     product = Products.query.filter_by(id=order.product).first()
     if request.method == 'POST':
         qty = request.form['qty']
@@ -193,6 +208,9 @@ def edit_kart(id):
 @buyer_login_required
 def item_order(id):
     order = Orders.query.filter_by(id=id).first()
+    if order.user != session['id']:
+        flash('Unauthorized Access','danger')
+        return redirect(url_for('login'))
     product = Products.query.filter_by(id=order.product).first()
     if order.qty > product.qty:
         flash("Requested Quantity Not Available",'danger')
@@ -220,16 +238,24 @@ def vendor_home():
     products=Products.query.filter_by(vendor=session['id']).all()
     return render_template('vendor_home.html',user = session['username'], products=products)
 
-@app.route('/vendor/orders')
+@app.route('/vendor/orders',methods=["GET","POST"])
 @vendor_login_required
 def vendor_orders():
     orders=Orders.query.filter_by(vendor=session['id'], state="Ordered").all()
-    return render_template('vendor_orders.html', orders = utils.get_vendor_orders(orders))
+    if request.method == "POST":
+        if request.form['customer'] != "Select Customer":
+            orders=Orders.query.filter_by(vendor=session['id'],user=request.form['customer'], state="Ordered").all()
+    orders= utils.get_vendor_orders(orders)
+    customers = utils.get_customers(session['id'])
+    return render_template('vendor_orders.html', orders = orders, customers =customers)
 
 @app.route('/order/<int:id>/delivery')
 @vendor_login_required
 def delivered(id):
     order=Orders.query.filter_by(id=id).first()
+    if order.vendor!= session['id']:
+        flash('Unauthorized Access','danger')
+        return redirect(url_for('login'))
     order.state = "Delivered"
     db.session.commit()
     return redirect(url_for('vendor_orders'))
@@ -238,7 +264,8 @@ def delivered(id):
 @vendor_login_required
 def vendor_past_orders():
     orders=Orders.query.filter_by(vendor=session['id'], state="Delivered").all()
-    return render_template('vendor_past_orders.html', orders = utils.get_vendor_orders(orders))
+    orders= utils.get_vendor_orders(orders)
+    return render_template('vendor_past_orders.html', orders = orders)
 
 @app.route('/product/add',methods=['GET','POST'])
 @vendor_login_required
@@ -282,6 +309,9 @@ def add_product():
 @vendor_login_required
 def edit_product(id):
     product = Products.query.filter_by(id=id).first()
+    if product.vendor!= session['id']:
+        flash('Unauthorized Access','danger')
+        return redirect(url_for('login'))
     if request.method == 'POST':
         product.name = request.form['product_name']
         product.category = request.form['category']
