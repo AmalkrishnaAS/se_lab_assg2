@@ -42,22 +42,22 @@
                         <label>Unit</label>
                         <select class="custom-select form-control" name="unit"required>
                             {%if product.unit=="kg"%}
-                            <option value="None">None</option>
+                            <option value="None">Nos</option>
                             <option value="kg" selected>kg</option>
                             <option value="g">g</option>
                             <option value="L">L</option>
                             {%elif product.unit=="g"%}
-                            <option value="None">None</option>
+                            <option value="None">Nos</option>
                             <option value="kg">kg</option>
                             <option value="g" selected>g</option>
                             <option value="L">L</option>
                             {%elif product.unit=="L"%}
-                            <option value="None">None</option>
+                            <option value="None">Nos</option>
                             <option value="kg">kg</option>
                             <option value="g">g</option>
                             <option value="L" selected>L</option>
                             {%else%}
-                            <option value="None"selected>None</option>
+                            <option value="None"selected>Nos</option>
                             <option value="kg">kg</option>
                             <option value="g">g</option>
                             <option value="L">L</option>

@@ -16,3 +16,4 @@ class DevelopConfig(Config):
     DEBUG=True
     SECRET_KEY="fgdmgfdgnmddrmdfmngndsm"
     UPLOAD_FOLDER = os.path.join(basedir,"../static/images/")
+    ALLOWED_EXTENSIONS=set(["png","jpg","jpeg","gif"])

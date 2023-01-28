@@ -1,4 +1,9 @@
 from application.models import *
+from flask import current_app as app
+
+def not_allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() not in app.config['ALLOWED_EXTENSIONS']
+
 
 def format_filename(id,filename):
     ext = filename.rsplit('.', 1)[1].lower()

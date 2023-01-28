@@ -145,10 +145,12 @@ def home():
 def add_to_cart(id):
     qty = request.form['quantity']
     product = Products.query.filter_by(id=id).first()
+    if float(qty)==0:
+        flash("Enter a Valid Quantity",'warning')
+        return redirect(url_for('home'))
     if product.qty < float(qty):
         flash("Requested Quantity Not Available",'danger')
         return redirect(url_for('home'))
-    
     order = Orders(vendor = product.vendor,
                    user = session['id'],
                    product = product.id,
@@ -275,13 +277,19 @@ def add_product():
         category = request.form['category']
         qty = request.form['qty']
         unit = request.form['unit']
+        if unit=="None" and float(qty)!=float(qty)//1:
+            flash("Unit Required for Fractional Quantity",'danger')
+            return redirect(url_for('add_product'))
         if unit == "None":
             unit = ' '
         price = request.form['price']
         vendor = session['id'] 
         image = request.files['image']
             
-        
+        if utils.not_allowed_file(image.filename):
+            flash("invalid file type", "danger")
+            return redirect(url_for('add_product.html'))
+
         product = Products(name = name,
                            vendor = vendor,
                            category = category,
@@ -317,6 +325,9 @@ def edit_product(id):
         product.category = request.form['category']
         product.qty = request.form['qty']
         unit = request.form['unit']
+        if unit=="None" and float(product.qty)!=float(product.qty)//1:
+            flash("Unit Required for Fractional Quantity",'danger')
+            return redirect(url_for('edit_product',id=id))
         if unit == "None":
             product.unit = ' '
         else:
@@ -324,7 +335,9 @@ def edit_product(id):
         product.price = request.form['price']
         product.vendor = session['id']
         image = request.files.get('image')
-
+        if utils.not_allowed_file(image.filename):
+            flash("invalid file type", "danger")
+            return redirect(url_for('edit_product',id=id))
         if image.filename:
             path = os.path.join(app.config['UPLOAD_FOLDER'], product.image)
             os.remove(path)
