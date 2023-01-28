@@ -172,6 +172,9 @@ def cart():
 @buyer_login_required
 def delete_from_kart(id):
     order = Orders.query.filter_by(id=id).first()
+    if order.user!= session['id']:
+        flash('Unauthorized Access','danger')
+        return redirect(url_for('login'))
     db.session.delete(order)
     db.session.commit()
     flash('Item Removed from Cart','success')
@@ -181,6 +184,9 @@ def delete_from_kart(id):
 @buyer_login_required
 def edit_kart(id):
     order = Orders.query.filter_by(id=id).first()
+    if order.user!= session['id']:
+        flash('Unauthorized Access','danger')
+        return redirect(url_for('login'))
     product = Products.query.filter_by(id=order.product).first()
     if request.method == 'POST':
         qty = request.form['qty']
@@ -202,6 +208,9 @@ def edit_kart(id):
 @buyer_login_required
 def item_order(id):
     order = Orders.query.filter_by(id=id).first()
+    if order.user != session['id']:
+        flash('Unauthorized Access','danger')
+        return redirect(url_for('login'))
     product = Products.query.filter_by(id=order.product).first()
     if order.qty > product.qty:
         flash("Requested Quantity Not Available",'danger')
@@ -244,6 +253,9 @@ def vendor_orders():
 @vendor_login_required
 def delivered(id):
     order=Orders.query.filter_by(id=id).first()
+    if order.vendor!= session['id']:
+        flash('Unauthorized Access','danger')
+        return redirect(url_for('login'))
     order.state = "Delivered"
     db.session.commit()
     return redirect(url_for('vendor_orders'))
@@ -297,6 +309,9 @@ def add_product():
 @vendor_login_required
 def edit_product(id):
     product = Products.query.filter_by(id=id).first()
+    if product.vendor!= session['id']:
+        flash('Unauthorized Access','danger')
+        return redirect(url_for('login'))
     if request.method == 'POST':
         product.name = request.form['product_name']
         product.category = request.form['category']
