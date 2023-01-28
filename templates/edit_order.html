@@ -1,0 +1,53 @@
+{% extends 'base_buyer.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card">
+        <div class="card-body p-5">
+            <h2 class="fw-bold mb-4">Edit Product</h2>
+            <form method='POST' enctype="multipart/form-data">
+                <div class="d-flex flex-row align-items-center flex-wrap">
+                    <div class="col-md-5 mb-3 mx-3">
+                        <label>Product Name</label>
+                        <input type="text" class="form-control" value={{product.name}} disabled>
+                    </div>
+                    <div class="col-md-5 mb-3 mx-3">
+                        <label>Category</label>
+                        <input type="text" class="form-control" value={{product.category}} disabled>
+                    </div>
+                </div>
+                <div class="d-flex flex-row align-items-center flex-wrap">
+                    <div class="col-md-5 mb-3 mx-3">
+                        <label>Vendor Name</label>
+                        <input type="text" class="form-control" value={{vendor.name}} disabled>
+                    </div>
+                    <div class="col-md-5 mb-3 mx-3">
+                        <label>Price per Unit</label>
+                        <input type="text" class="form-control" value={{product.price}} disabled/>
+                    </div>
+                </div>
+                <div class="d-flex flex-row align-items-center flex-wrap">
+                    <div class="col-md-5 mb-3 mx-3">
+                        <label>Quantity Available</label>
+                        <input type="text" class="form-control" value={{product.qty}} disabled/>
+                    </div>
+                    <div class="col-md-5 mb-3 mx-3">
+                        <label>Order Quantity</label>
+                        {%if product.unit=="kg"%}
+                        <input class="form-control" type="number" name="qty" value={{order.qty}} step=0.01 min=0>
+                        {%elif product.unit=="g"%}
+                        <input class="form-control" type="number" name="qty" value={{order.qty}} step=10 min=0>
+                        {%elif product.unit=="L"%}
+                        <input class="form-control" type="number" name="qty" value={{order.qty}} step=0.01 min=0>
+                        {%else%}
+                        <input class="form-control" type="number" name="qty" value={{order.qty}} step=1 min=0>
+                        {%endif%}
+                    </div>
+                </div>
+                <input class="btn btn-primary" type="submit"></input>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

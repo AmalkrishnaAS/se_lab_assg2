@@ -168,6 +168,27 @@ def delete_from_kart(id):
     flash('Item Removed from Cart','success')
     return redirect(url_for('cart'))
 
+@app.route('/order/<int:id>/edit',methods=['GET','POST'])
+@buyer_login_required
+def edit_kart(id):
+    order = Orders.query.filter_by(id=id).first()
+    product = Products.query.filter_by(id=order.product).first()
+    if request.method == 'POST':
+        qty = request.form['qty']
+        if float(qty) > product.qty:
+            flash("Requested Quantity Not Available",'danger')
+            return redirect(url_for('cart'))
+        else:
+            order.qty = qty
+            db.session.commit()
+            flash("Order Updated",'success')
+            return redirect(url_for('cart'))
+    else:
+        vendor = Vendors.query.filter_by(id=order.vendor).first()
+        return render_template('edit_order.html',order = order, product = product,vendor=vendor)
+
+
+
 @app.route('/add/<int:id>/order')
 @buyer_login_required
 def item_order(id):
