@@ -65,15 +65,23 @@ def get_vendor_orders(orders):
     out = []
     for order in orders:
         product = Products.query.filter_by(id=order.product).first()
-        vendor = Vendors.query.filter_by(id=order.vendor).first()
+        buyer = User.query.filter_by(id=order.user).first()
         item = {
             'id': order.id,
-            'buyer_name': vendor.name,
-            'buyer_phone': vendor.phone,
+            'buyer_name': buyer.name,
+            'buyer_phone': buyer.phone,
             'product_name': product.name,
             'qty': order.qty,
             'date': order.date,
             'price': round(order.price * order.qty,2)
         }
+        out.append(item)
+    return out
+
+def get_customers(id):
+    orders = Orders.query.filter_by(vendor=id, state="Ordered").all()
+    out = []
+    for order in orders:
+        item = User.query.filter_by(id=order.user).first()
         out.append(item)
     return out

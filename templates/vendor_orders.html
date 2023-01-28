@@ -4,7 +4,17 @@
 <div class="container py-5 h-100">
   <div class="card" style="border-radius: 15px;">
       <div class="card-body p-4">
-          <h3>Current Orders</h3>
+        <h3>Current Orders</h3>
+        <form class="d-md-flex flex-row my-3" method="POST">
+          <select class="form-select w-25 mx-3" name="customer">
+            <option>Select Customer</option>
+            {%for customer in customers%}
+            <option value={{customer.id}} {% if request.form['customer']|string() == customer.id|string() %}selected{%endif%}>{{customer.name}}</option>
+            {%endfor%}
+          </select>                
+          <button type="submit" class="btn btn-primary mx-3">Filter</button>
+        </form>
+
           <table class="table">
               <thead>
                 <tr>

@@ -12,6 +12,27 @@
 </div>
 <div class="container py-5 h-100">
   <div class="card" style="border-radius: 15px;">
+    <div class="card-body p-4 ">
+        <form class="d-sm-flex flex-row justify-content-center flex-wrap" method="POST">
+          <select class="form-select w-25 mx-3" name="vendor">
+            <option>Select Vendor</option>
+            {%for vendor in vendors%}
+            <option value={{vendor.id}} {% if request.form['vendor']|string() == vendor.id|string() %}selected{%endif%}>{{vendor.name}}</option>
+            {%endfor%}
+          </select>
+          <select class="form-select w-25 mx-3" name="category">
+            <option>Select Category</option>
+            <option value="Fruits&Vegetables" {%if request.form['category']|string() =="Fruits&Vegetables"%}selected{%endif%}>Fruits&Vegetables</option>
+            <option value="Diary Items" {%if request.form['category']|string() =="Diary Items"%}selected{%endif%}>Diary Items</option>
+            <option value="Other" {%if request.form['category']|string() =="Other"%}selected{%endif%}>Other</option>
+          </select>                
+          <button type="submit" class="btn btn-primary mx-3">Filter</button>
+        </form>
+    </div>
+  </div>
+</div>
+<div class="container py-5 h-100">
+  <div class="card" style="border-radius: 15px;">
     <div class="card-body p-4 justify-content-center" style="overflow-x:auto;">
       <table class="table">
         <thead>
