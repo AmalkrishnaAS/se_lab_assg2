@@ -146,7 +146,7 @@ def add_to_cart(id):
     qty = request.form['quantity']
     product = Products.query.filter_by(id=id).first()
     if float(qty)==0:
-        flash("Enter a Valid Quantity",'warning')
+        flash("Enter a Valid Quantity",'danger')
         return redirect(url_for('home'))
     if product.qty < float(qty):
         flash("Requested Quantity Not Available",'danger')
@@ -192,6 +192,9 @@ def edit_kart(id):
     product = Products.query.filter_by(id=order.product).first()
     if request.method == 'POST':
         qty = request.form['qty']
+        if float(qty)==0:
+            flash("Enter a Valid Quantity",'danger')
+            return redirect(url_for('home'))
         if float(qty) > product.qty:
             flash("Requested Quantity Not Available",'danger')
             return redirect(url_for('cart'))
