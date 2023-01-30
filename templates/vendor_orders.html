@@ -36,7 +36,7 @@
                                   Phone: {{order['buyer_phone']}}</span>
                               </div>
                           </td>
-                          <td>{{ order['product_name'] }} x {{ order['qty'] }}</td>
+                          <td>{{ order['product_name'] }} x {{ order['qty'] }} {{ order['unit'] }}</td>
                           <td>₹ {{ order['price'] }}</td>
                           <td><a href="{{url_for('delivered',id=order['id'])}}" class="btn btn-primary">Delivered</a></td>
                       </tr>

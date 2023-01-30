@@ -26,7 +26,7 @@
                                   Phone: {{order['buyer_phone']}}</span>
                               </div>
                           </td>
-                          <td>{{ order['product_name'] }} x {{ order['qty'] }}</td>
+                          <td>{{ order['product_name'] }} x {{ order['qty'] }} {{ order['unit'] }}</td>
                           <td>{{ order['date'] }}</td>
                           <td>₹ {{ order['price'] }}</td>
                       </tr>

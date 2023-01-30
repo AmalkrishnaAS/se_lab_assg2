@@ -57,6 +57,7 @@ def get_orders(id):
             'vendor_phone': vendor.phone,
             'product_name': product.name,
             'qty': order.qty,
+            'unit': product.unit,
             'date': order.date,
             'price': round(order.price * order.qty,2)
         }
@@ -77,6 +78,7 @@ def get_vendor_orders(orders):
             'buyer_phone': buyer.phone,
             'product_name': product.name,
             'qty': order.qty,
+            'unit': product.unit,
             'date': order.date,
             'price': round(order.price * order.qty,2)
         }
