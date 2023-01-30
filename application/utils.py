@@ -84,7 +84,7 @@ def get_vendor_orders(orders):
     return out
 
 def get_customers(id):
-    orders = Orders.query.filter_by(vendor=id, state="Ordered").all()
+    orders = Orders.query.distinct(Orders.user).with_entities(Orders.user).filter_by(vendor=id, state="Ordered").all()
     out = []
     for order in orders:
         item = User.query.filter_by(id=order.user).first()
